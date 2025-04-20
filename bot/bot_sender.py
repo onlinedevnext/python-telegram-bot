@@ -1,11 +1,8 @@
-import httpx
-from config import BOT_TOKEN
+from pyrogram import Client
+import os
 
-API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
+bot = Client("sender", api_id=int(os.getenv("API_ID")), api_hash=os.getenv("API_HASH"), bot_token=os.getenv("TELEGRAM_BOT_TOKEN"))
 
 async def send_file(file_id: str, user_id: int):
-    async with httpx.AsyncClient() as client:
-        await client.post(API_URL, data={
-            "chat_id": user_id,
-            "document": file_id
-        })
+    async with bot:
+        await bot.send_document(chat_id=user_id, document=file_id)
