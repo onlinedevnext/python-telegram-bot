@@ -1,16 +1,20 @@
 from pymongo import MongoClient
-from config import MONGODB_URI
+import os
+from datetime import datetime
 
-client = MongoClient(MONGODB_URI)
-db = client['telegram_bot']
-file_links = db['file_links']
+client = MongoClient(os.getenv("MONGODB_URI"))
+db = client["filebot"]
+collection = db["files"]
 
-def save_file(user_id, file_id, unique_id):
-    file_links.insert_one({
-        "user_id": user_id,
+def save_file(unique_id, file_id, file_name, user_id):
+    data = {
+        "unique_id": unique_id,
         "file_id": file_id,
-        "unique_id": unique_id
-    })
+        "file_name": file_name,
+        "user_id": user_id,
+        "created_at": datetime.utcnow()
+    }
+    collection.insert_one(data)
 
 def get_file_by_unique_id(unique_id):
-    return file_links.find_one({"unique_id": unique_id})
+    return collection.find_one({"unique_id": unique_id})
